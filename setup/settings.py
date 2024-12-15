@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'mini_twitter.apps.MiniTwitterConfig',
 ]
 
 MIDDLEWARE = [
