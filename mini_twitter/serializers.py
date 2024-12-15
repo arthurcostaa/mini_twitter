@@ -4,6 +4,8 @@ from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from mini_twitter.models import Post
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -52,3 +54,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'password']
+
+
+class PostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Post
+        fields = ['id', 'content', 'author', 'created_at', 'updated_at']

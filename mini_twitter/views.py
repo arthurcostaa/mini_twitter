@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
-from rest_framework import permissions, viewsets
+from rest_framework import generics, permissions, viewsets
 
+from mini_twitter.models import Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
-from mini_twitter.serializers import UserSerializer
+from mini_twitter.serializers import PostSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -23,3 +24,18 @@ class UserViewSet(viewsets.ModelViewSet):
                 IsOwnerOrReadOnly,
             ]
         return [permission() for permission in permission_classes]
+
+
+class PostCreateView(generics.CreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
+
+
+class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
