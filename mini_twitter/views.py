@@ -1,9 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions, viewsets
 
-from mini_twitter.models import Post
+from mini_twitter.models import Comment, Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
-from mini_twitter.serializers import PostSerializer, UserSerializer
+from mini_twitter.serializers import (
+    CommentSerializer,
+    PostSerializer,
+    UserSerializer,
+)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -29,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class PostCreate(generics.CreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
@@ -45,3 +49,12 @@ class PostList(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CommentCreate(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)

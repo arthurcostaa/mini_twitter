@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from mini_twitter.models import Post
+from mini_twitter.models import Comment, Post
+
+
+class CommentInline(admin.TabularInline):
+    model = Comment
+    extra = 0
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -10,5 +15,17 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ['author']
     search_fields = ['content']
     list_per_page = 20
+    inlines = [CommentInline]
+
+
+class CommentAdmin(admin.ModelAdmin):
+    fields = ['comment', 'author', 'post']
+    list_display = ['id', 'author', 'comment', 'post', 'created_at', 'updated_at']
+    list_display_links = ['id', 'comment']
+    list_filter = ['author', 'post']
+    search_fields = ['comment']
+    list_per_page = 20
+
 
 admin.site.register(Post, PostAdmin)
+admin.site.register(Comment, CommentAdmin)

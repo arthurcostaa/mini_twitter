@@ -4,7 +4,7 @@ from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from mini_twitter.models import Post
+from mini_twitter.models import Comment, Post
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -62,3 +62,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'content', 'author', 'created_at', 'updated_at']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment', 'author', 'post', 'created_at', 'updated_at']
