@@ -5,11 +5,9 @@ from mini_twitter import views
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='user')
+router.register('posts', views.PostViewSet, basename='posts')
 router.register('comments', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('posts/', views.PostCreate.as_view(), name='post-create'),
-    path('posts/<int:pk>/', views.PostDetail.as_view(), name='post-detail'),
-    path('feed/', views.PostList.as_view(), name='post-list'),
 ]

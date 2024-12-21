@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import generics, permissions, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.validators import ValidationError
 
 from mini_twitter.models import Comment, Post
@@ -35,25 +35,13 @@ class UserViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class PostCreate(generics.CreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        return serializer.save(author=self.request.user)
-
-
-class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-
-class PostList(generics.ListAPIView):
-    queryset = Post.objects.prefetch_related('comments')
-    serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
