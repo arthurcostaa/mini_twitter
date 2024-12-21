@@ -5,6 +5,7 @@ from mini_twitter.models import Comment, Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
 from mini_twitter.serializers import (
     CommentSerializer,
+    CommentUpdateSerializer,
     PostSerializer,
     UserSerializer,
 )
@@ -57,4 +58,14 @@ class CommentCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
+
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def perform_update(self, serializer):
+        print(serializer.validated_data)
         return serializer.save(author=self.request.user)
