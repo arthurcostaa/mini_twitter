@@ -56,7 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'username', 'password']
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentCreateSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     post_id = serializers.PrimaryKeyRelatedField(
         source='post',
@@ -68,7 +68,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'comment', 'author', 'post_id', 'created_at', 'updated_at']
 
 
-class CommentUpdateSerializer(serializers.ModelSerializer):
+class CommentRetrieveUpdateSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     post_id = serializers.ReadOnlyField(source='post.id')
 
@@ -79,7 +79,7 @@ class CommentUpdateSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
-    comments = CommentSerializer(many=True, read_only=True)
+    comments = CommentRetrieveUpdateSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post

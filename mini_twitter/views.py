@@ -1,11 +1,15 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
+from django.utils import timezone
 from rest_framework import generics, permissions, viewsets
+from rest_framework.validators import ValidationError
 
 from mini_twitter.models import Comment, Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
 from mini_twitter.serializers import (
-    CommentSerializer,
-    CommentUpdateSerializer,
+    CommentCreateSerializer,
+    CommentRetrieveUpdateSerializer,
     PostSerializer,
     UserSerializer,
 )
@@ -52,20 +56,20 @@ class PostList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class CommentCreate(generics.CreateAPIView):
+class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CommentCreateSerializer
+        return CommentRetrieveUpdateSerializer
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
 
-
-class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Comment.objects.all()
-    serializer_class = CommentUpdateSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
-
     def perform_update(self, serializer):
-        print(serializer.validated_data)
-        return serializer.save(author=self.request.user)
+        comment = Comment.objects.get(pk=self.kwargs['pk'])
+        if timezone.now() <= comment.created_at + timedelta(hours=1):
+            return serializer.save()
+        raise ValidationError('Não é mais possível atualizar o comentário.')
