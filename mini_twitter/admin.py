@@ -10,7 +10,14 @@ class CommentInline(admin.TabularInline):
 
 class PostAdmin(admin.ModelAdmin):
     fields = ['content', 'author']
-    list_display = ['id', 'author', 'content', 'created_at', 'updated_at']
+    list_display = [
+        'id',
+        'author',
+        'content',
+        'total_comments',
+        'created_at',
+        'updated_at',
+    ]
     list_display_links = ['id', 'content']
     list_filter = ['author']
     search_fields = ['content']
