@@ -4,6 +4,8 @@ from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from mini_twitter.models import Comment, Post
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -52,3 +54,41 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'password']
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    post_id = serializers.PrimaryKeyRelatedField(
+        source='post',
+        queryset=Post.objects.all()
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment', 'author', 'post_id', 'created_at', 'updated_at']
+
+
+class CommentRetrieveUpdateSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    post_id = serializers.ReadOnlyField(source='post.id')
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment', 'author', 'post_id', 'created_at', 'updated_at']
+
+
+class PostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    comments = CommentRetrieveUpdateSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Post
+        fields = [
+            'id',
+            'content',
+            'author',
+            'total_comments',
+            'comments',
+            'created_at',
+            'updated_at',
+        ]
