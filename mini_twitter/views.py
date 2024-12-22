@@ -58,13 +58,29 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_object()
         user = request.user
 
-        if post.likes.filter(id=user.id).exists():
-            post.likes.remove(user)
-        else:
+        if not post.likes.filter(id=user.id).exists():
             post.likes.add(user)
 
         serializer = PostLikesSerializer(post)
         return Response(serializer.data)
+
+    @like_post.mapping.delete
+    def unlike_post(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+
+        serializer = PostLikesSerializer(post)
+        return Response(serializer.data)
+
+    @like_post.mapping.get
+    def user_liked_post(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        liked = post.likes.filter(id=user.id).exists()
+        return Response({'liked': liked})
 
 
 class CommentViewSet(viewsets.ModelViewSet):
