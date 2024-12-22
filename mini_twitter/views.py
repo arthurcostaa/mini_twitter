@@ -2,7 +2,10 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.validators import ValidationError
 
 from mini_twitter.models import Comment, Post
@@ -11,6 +14,7 @@ from mini_twitter.serializers import (
     CommentCreateSerializer,
     CommentRetrieveUpdateSerializer,
     PostSerializer,
+    PostLikesSerializer,
     UserSerializer,
 )
 
@@ -26,10 +30,10 @@ class UserViewSet(viewsets.ModelViewSet):
         as outras ações exigem que o usário esteja autenticado.
         """
         if self.action == 'create':
-            permission_classes = [permissions.AllowAny]
+            permission_classes = [AllowAny]
         else:
             permission_classes = [
-                permissions.IsAuthenticated,
+                IsAuthenticated,
                 IsOwnerOrReadOnly,
             ]
         return [permission() for permission in permission_classes]
@@ -38,15 +42,55 @@ class UserViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
 
+    @action(
+        detail=True,
+        methods=['post'],
+        url_path='like',
+        url_name='like',
+        permission_classes=[IsAuthenticated]
+    )
+    def like_post(self, request, pk=None):
+        """Adiciona um like em um post."""
+        post = self.get_object()
+        user = request.user
+        liked = post.likes.filter(id=user.id).exists()
+
+        if not liked:
+            post.likes.add(user)
+
+        serializer = PostLikesSerializer(post)
+        return Response(serializer.data)
+
+    @like_post.mapping.delete
+    def unlike_post(self, request, pk=None):
+        """Remove like de um post."""
+        post = self.get_object()
+        user = request.user
+        liked = post.likes.filter(id=user.id).exists()
+
+        if liked:
+            post.likes.remove(user)
+
+        serializer = PostLikesSerializer(post)
+        return Response(serializer.data)
+
+    @like_post.mapping.get
+    def user_liked_post(self, request, pk=None):
+        """Verifica se o usuário de like em um post."""
+        post = self.get_object()
+        user = request.user
+        liked = post.likes.filter(id=user.id).exists()
+        return Response({'liked': liked})
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         if self.action == 'create':

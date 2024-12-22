@@ -80,6 +80,7 @@ class CommentRetrieveUpdateSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     comments = CommentRetrieveUpdateSerializer(many=True, read_only=True)
+    likes = serializers.ReadOnlyField(source='total_likes')
 
     class Meta:
         model = Post
@@ -87,8 +88,23 @@ class PostSerializer(serializers.ModelSerializer):
             'id',
             'content',
             'author',
+            'likes',
             'total_comments',
             'comments',
+            'created_at',
+            'updated_at',
+        ]
+
+
+class PostLikesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = [
+            'id',
+            'content',
+            'author',
+            'total_likes',
+            'total_comments',
             'created_at',
             'updated_at',
         ]
