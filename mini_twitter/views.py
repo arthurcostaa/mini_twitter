@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -86,6 +86,15 @@ class PostViewSet(viewsets.ModelViewSet):
         user = request.user
         liked = post.likes.filter(id=user.id).exists()
         return Response({'liked': liked})
+
+
+class PostLikedList(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.post_likes.all()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
