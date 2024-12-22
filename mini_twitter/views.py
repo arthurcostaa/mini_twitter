@@ -55,10 +55,12 @@ class PostViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def like_post(self, request, pk=None):
+        """Adiciona um like em um post."""
         post = self.get_object()
         user = request.user
+        liked = post.likes.filter(id=user.id).exists()
 
-        if not post.likes.filter(id=user.id).exists():
+        if not liked:
             post.likes.add(user)
 
         serializer = PostLikesSerializer(post)
@@ -66,10 +68,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @like_post.mapping.delete
     def unlike_post(self, request, pk=None):
+        """Remove like de um post."""
         post = self.get_object()
         user = request.user
+        liked = post.likes.filter(id=user.id).exists()
 
-        if post.likes.filter(id=user.id).exists():
+        if liked:
             post.likes.remove(user)
 
         serializer = PostLikesSerializer(post)
@@ -77,6 +81,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @like_post.mapping.get
     def user_liked_post(self, request, pk=None):
+        """Verifica se o usuário de like em um post."""
         post = self.get_object()
         user = request.user
         liked = post.likes.filter(id=user.id).exists()
