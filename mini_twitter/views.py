@@ -2,12 +2,14 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import viewsets
+from django_filters import rest_framework as filters
+from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.validators import ValidationError
 
+from mini_twitter.filters import PostFilter
 from mini_twitter.models import Comment, Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
 from mini_twitter.serializers import (
@@ -43,6 +45,8 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = PostFilter
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
@@ -86,6 +90,15 @@ class PostViewSet(viewsets.ModelViewSet):
         user = request.user
         liked = post.likes.filter(id=user.id).exists()
         return Response({'liked': liked})
+
+
+class PostLikedList(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.post_likes.all()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
