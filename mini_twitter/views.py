@@ -2,12 +2,14 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django_filters import rest_framework as filters
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.validators import ValidationError
 
+from mini_twitter.filters import PostFilter
 from mini_twitter.models import Comment, Post
 from mini_twitter.permissions import IsOwnerOrReadOnly
 from mini_twitter.serializers import (
@@ -40,20 +42,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-    def get_queryset(self):
-        queryset = Post.objects.all()
-        author_name = self.request.query_params.get('author')
-        content = self.request.query_params.get('content')
-
-        if author_name:
-            queryset = queryset.filter(author__username=author_name)
-        if content:
-            queryset = queryset.filter(content__icontains=content)
-
-        return queryset
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = PostFilter
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
