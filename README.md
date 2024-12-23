@@ -73,7 +73,7 @@ Será retornado um *json* com os campos `refresh` e `access` como o seguinte:
 }
 ```
 
-O tempo de validade do token é de 30 minutos, após isso é possível renová-lo o token `refresh`. Para isso basta enviar um *json* com esse campo do seguinte modo:
+O tempo de validade do token é de 30 minutos, após isso é possível renová-lo o token `refresh`. Para isso basta enviar um *json* com esse campo do seguinte modo em `POST /auth/token/refresh/`:
 
 ```json
 {
@@ -82,3 +82,23 @@ O tempo de validade do token é de 30 minutos, após isso é possível renová-l
 ```
 
 Para utilizar o token JWT em outros endpoints da API basta clicar no botão *Authorize* na parte de cima da página, forcener o token e autenticar-se. Após isso, enquanto esse token for válido será possível utilizar os outros recursos da API.
+
+#### Posts
+
+Para criar um novo post é necessário estar autenticado e enviar o seguinte *json* na requisição:
+
+```json
+{
+  "content": "Hello!"
+}
+```
+
+Alguns campos do post já serão preenchidos automaticamente pela aplicação, como o autor e a data de criação.
+
+Para atualizar, deletar ou obter um único post basta realizar uma requisão http do tipo PATCH ou PUT, DELETE e GET, respectivamente, fornecendo o `id` do post em `/post/{id}/`.
+
+Também é possível obter todos os posts publicados em `GET /posts/`, ordenados pela data de criação, do mais recente para os mais antigos, com uma paginação de 30 elementos por página. Também é possível filtrar os posts pelo nome do author e pelo seu conteúdo.
+
+Para dar like em um post basta enviar uma requisição `POST` em `/posts/{id}/like/` e para remover o like basta fazer uma requisição `DELETE` no mesmo endereço. Para verificar se o usuário curtiu ou não o post basta fazer uma requisição do tipo `GET`.
+
+Para selecionar todos os posts que o usuário curtiu basta fazer uma requisição `GET` em `/posts/liked/`.
