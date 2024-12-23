@@ -40,9 +40,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        author_name = self.request.query_params.get('author')
+        content = self.request.query_params.get('content')
+
+        if author_name:
+            queryset = queryset.filter(author__username=author_name)
+        if content:
+            queryset = queryset.filter(content__icontains=content)
+
+        return queryset
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
