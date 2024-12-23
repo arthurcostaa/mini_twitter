@@ -117,3 +117,14 @@ Para criar um comentário é necessário estar autenticado e fornecer um *json* 
 ```
 
 Também é possível atualizar, obter um único ou excluir um comentário enviando o seu *id* em `/comments/{id}` via uma requisição `PATCH` ou `PUT`, `GET` e `DELETE`, respectivamente. É importante notar que só é possível atualizar um comentário até no máximo 1 hora após a sua data de criação.
+
+## Tecnologias utilizadas
+
+As principais tecnologias utilizadas para o desenvolvimento desse projeto foram:
+
+* Python 3.13.0
+* Django 5.1.4
+* Django Rest Framework 3.15.2
+* Django Rest Framework Simple JWT 5.3.1
+* DRF Spetacular 0.28.0
+* DRF Spetacular Sidecar 2024.12.1
