@@ -95,10 +95,25 @@ Para criar um novo post é necessário estar autenticado e enviar o seguinte *js
 
 Alguns campos do post já serão preenchidos automaticamente pela aplicação, como o autor e a data de criação.
 
-Para atualizar, deletar ou obter um único post basta realizar uma requisão http do tipo PATCH ou PUT, DELETE e GET, respectivamente, fornecendo o `id` do post em `/post/{id}/`.
+Para atualizar, deletar ou obter um único post basta realizar uma requisão http do tipo `PATCH` ou `PUT`, `DELETE` e `GET`, respectivamente, fornecendo o `id` do post em `/post/{id}/`.
 
 Também é possível obter todos os posts publicados em `GET /posts/`, ordenados pela data de criação, do mais recente para os mais antigos, com uma paginação de 30 elementos por página. Também é possível filtrar os posts pelo nome do author e pelo seu conteúdo.
+
+Um elemento que representa um post conterá o seu *id*, conteúdo, data de criação e atualização, autor, número de likes e comentários e um array contendo todos os comentários.
 
 Para dar like em um post basta enviar uma requisição `POST` em `/posts/{id}/like/` e para remover o like basta fazer uma requisição `DELETE` no mesmo endereço. Para verificar se o usuário curtiu ou não o post basta fazer uma requisição do tipo `GET`.
 
 Para selecionar todos os posts que o usuário curtiu basta fazer uma requisição `GET` em `/posts/liked/`.
+
+#### Comentários
+
+Para criar um comentário é necessário estar autenticado e fornecer um *json* com o conteúdo do comentário e o *id* do post em `/comments/` da seguinte forma:
+
+```json
+{
+  "comment": "Nice post",
+  "post_id": 1
+}
+```
+
+Também é possível atualizar, obter um único ou excluir um comentário enviando o seu *id* em `/comments/{id}` via uma requisição `PATCH` ou `PUT`, `GET` e `DELETE`, respectivamente. É importante notar que só é possível atualizar um comentário até no máximo 1 hora após a sua data de criação.
