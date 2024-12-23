@@ -10,11 +10,11 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
-    def total_comments(self):
+    def total_comments(self) -> int:
         return self.comments.count()
 
     @property
-    def total_likes(self):
+    def total_likes(self) -> int:
         return self.likes.count()
 
     def __str__(self):
