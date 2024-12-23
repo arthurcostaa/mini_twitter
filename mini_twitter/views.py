@@ -51,6 +51,13 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
 
+    def perform_update(self, serializer):
+        post = Post.objects.get(pk=self.kwargs['pk'])
+        if timezone.now() <= post.created_at + timedelta(hours=1):
+            return serializer.save()
+        raise ValidationError({'detail': 'Não é mais possível atualizar o post.'})
+
+
     @action(
         detail=True,
         methods=['post'],
@@ -117,4 +124,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.get(pk=self.kwargs['pk'])
         if timezone.now() <= comment.created_at + timedelta(hours=1):
             return serializer.save()
-        raise ValidationError('Não é mais possível atualizar o comentário.')
+        raise ValidationError({'detail': 'Não é mais possível atualizar o comentário.'})
