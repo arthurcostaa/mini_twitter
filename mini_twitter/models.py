@@ -18,7 +18,7 @@ class Post(models.Model):
         return self.likes.count()
 
     def __str__(self):
-        return self.content[:30]
+        return f'{self.id} - {self.content[:30]}'
 
     class Meta:
         ordering = ['-created_at', 'author']
@@ -36,7 +36,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.comment[:30]
+        return f'{self.id} - {self.comment[:30]}'
 
     class Meta:
         ordering = ['-created_at', 'author']
