@@ -160,7 +160,7 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Mini Twitter API',
-    'DESCRIPTION': 'API para simular ',
+    'DESCRIPTION': 'API para simular uma rede social (mini twitter)',
     'VERSION': '1.0.0',
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',

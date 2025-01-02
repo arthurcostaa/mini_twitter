@@ -15,6 +15,7 @@ class PostAdmin(admin.ModelAdmin):
         'author',
         'content',
         'total_comments',
+        'total_likes',
         'created_at',
         'updated_at',
     ]
