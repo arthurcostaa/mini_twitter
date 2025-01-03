@@ -22,7 +22,7 @@ from mini_twitter.serializers import (
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('username')
     serializer_class = UserSerializer
 
     def get_permissions(self):
